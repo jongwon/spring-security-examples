@@ -1,11 +1,13 @@
 package com.sp.config;
 
+import com.sp.service.UserSecService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -13,26 +15,26 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import javax.sql.DataSource;
 
 /**
- * Created by jongwon on 2017. 4. 20..
+ * Created by jongwon on 2017. 4. 21..
  */
 @Configuration
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
-
 
 	@Autowired
 	@SuppressWarnings("SpringJavaAutowiringInspection")
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	@Autowired
 	@SuppressWarnings("SpringJavaAutowiringInspection")
-	private DataSource dataSource;
+	@Autowired
+	private UserSecService userSecService;
 
+	@Autowired
+	public void configAuthBuilder(AuthenticationManagerBuilder builder) throws Exception {
+		builder.userDetailsService(userSecService)
+		.passwordEncoder(bCryptPasswordEncoder);
+	}
 
-	private String usersQuery = "select email, password, active from user where email=?";
-
-	private String rolesQuery = "select u.email, r.role " +
-			"from user u inner join user_role ur on(u.user_id=ur.user_id) " +
-			"inner join role r on(ur.role_id=r.role_id) where u.email=?";
 
 
 	@Override
@@ -56,20 +58,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 				.antMatchers("/registration").permitAll()
 				.antMatchers("/hello").hasAuthority("ADMIN")
 				.anyRequest()
-					.authenticated().and()
+				.authenticated().and()
 				.csrf()
-					.disable()
+				.disable()
 				.formLogin()
-					.loginPage("/login")
-					.failureUrl("/login?error=true")
-					.defaultSuccessUrl("/hello")
-					.usernameParameter("email")
-					.passwordParameter("password")
-					.and()
+				.loginPage("/login")
+				.failureUrl("/login?error=true")
+				.defaultSuccessUrl("/hello")
+				.usernameParameter("email")
+				.passwordParameter("password")
+				.and()
 				.logout()
-					.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-					.logoutSuccessUrl("/").and().exceptionHandling()
-					.accessDeniedPage("/access-denied");
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+				.logoutSuccessUrl("/").and().exceptionHandling()
+				.accessDeniedPage("/access-denied");
+
 
 	}
 
@@ -81,15 +84,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
 	}
 
-
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.
-				jdbcAuthentication()
-				.usersByUsernameQuery(usersQuery)
-				.authoritiesByUsernameQuery(rolesQuery)
-				.dataSource(dataSource)
-				.passwordEncoder(bCryptPasswordEncoder);
-	}
 
 }

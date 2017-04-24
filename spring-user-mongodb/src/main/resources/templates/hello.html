@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+	<title>Spring Security Example </title>
+</head>
+<body>
+<h2> Hello world !!! </h2>
+<div class="message" th:text="${userName}">
+	이곳에 사용자 이름의 메시지가 나와야 함..
+</div>
+<div class="container">
+	<a th:href="@{/logout}"> logout </a>
+</div>
+</body>
+</html>

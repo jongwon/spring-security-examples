@@ -1,36 +1,28 @@
 package com.sp.controller;
 
 import com.sp.domain.User;
-import com.sp.service.UserService;
+import com.sp.service.UserSecService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import static java.lang.String.format;
 
 /**
- * Created by jongwon on 2017. 4. 20..
+ * Created by jongwon on 2017. 4. 21..
  */
 @Controller
 public class HomeController {
 
-
 	@Autowired
-	private UserService userService;
+	private UserSecService userService;
 
 	@RequestMapping(value={"/", "/home"}, method = RequestMethod.GET)
 	public String home(){
@@ -85,5 +77,4 @@ public class HomeController {
 		modelAndView.setViewName("hello");
 		return modelAndView;
 	}
-
 }
